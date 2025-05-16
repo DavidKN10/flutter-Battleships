@@ -1,0 +1,72 @@
+### To run the requests in this file, you can use the REST Client extension 
+### for Visual Studio Code, found at:
+###   https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+
+@hostname= battleships-app.onrender.com
+
+###
+# Register a new user
+# @name register
+POST https://{{hostname}}/register
+Content-type: application/json
+
+{
+    "username": "michael",
+    "password": "abc123"
+}
+
+###
+# Login with an existing user
+# @name login
+POST https://{{hostname}}/login
+Content-type: application/json
+
+{
+    "username": "michael",
+    "password": "abc123"
+}
+
+###
+# Get a list of games for the authenticated user
+@token = {{login.response.body.$.access_token}}
+GET https://{{hostname}}/games
+Authorization: Bearer {{token}}
+
+###
+# Start a new game
+# @name createGame
+@token = {{login.response.body.$.access_token}}
+POST https://{{hostname}}/games
+Content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "ships": ["A1", "B2", "C3", "D4", "E5"],
+    "ai" : "oneship"
+}
+
+###
+# Get the details of a game
+@token = {{login.response.body.$.access_token}}
+@gameId = {{createGame.response.body.$.id}}
+GET https://{{hostname}}/games/{{gameId}}
+Authorization: Bearer {{token}}
+
+###
+# Play a shot in a game
+@token = {{login.response.body.$.access_token}}
+@gameId = {{createGame.response.body.$.id}}
+PUT https://{{hostname}}/games/{{gameId}}
+Content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "shot": "A1"
+}
+
+###
+# Cancel/Forfeit a game
+@token = {{login.response.body.$.access_token}}
+@gameId = {{createGame.response.body.$.id}}
+DELETE https://{{hostname}}/games/{{gameId}}
+Authorization: Bearer {{token}}
